@@ -1,8 +1,14 @@
-# EXAMPLE: Paths to raw data
-rawdata:
-  sample_A: example/data_A
-  sample_B: example/data_B
+reads:
+  lib_505_1L:
+    fwd: /ebio/abt2_projects/ag-swart-loxodes-raw/data/dnase-seq/505_1L_S2_R1_001.fastq.gz
+    rev: /ebio/abt2_projects/ag-swart-loxodes-raw/data/dnase-seq/505_1L_S2_R2_001.fastq.gz
+  lib_505_2L:
+    fwd: /ebio/abt2_projects/ag-swart-loxodes-raw/data/dnase-seq/505_2L_S4_R1_001.fastq.gz
+    rev: /ebio/abt2_projects/ag-swart-loxodes-raw/data/dnase-seq/505_2L_S4_R2_001.fastq.gz
+  lib_505_1U:
+    fwd: /ebio/abt2_projects/ag-swart-loxodes-raw/data/dnase-seq/505_1U_S1_R1_001.fastq.gz
+    rev: /ebio/abt2_projects/ag-swart-loxodes-raw/data/dnase-seq/505_1U_S1_R2_001.fastq.gz
+  lib_505_2U:
+    fwd: /ebio/abt2_projects/ag-swart-loxodes-raw/data/dnase-seq/505_2U_S3_R1_001.fastq.gz
+    rev: /ebio/abt2_projects/ag-swart-loxodes-raw/data/dnase-seq/505_2U_S3_R2_001.fastq.gz
 
-samplenames:
-  - sample_A
-  - sample_B

@@ -2,6 +2,5 @@ channels:
   - conda-forge
   - bioconda
   - defaults
-channel_priority: strict
 dependencies:
-  - phyloflash=3.3b1
+  - bbmap>=38.18

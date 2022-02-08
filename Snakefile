@@ -4,14 +4,18 @@
 
 rule all:
     input:
-        expand("{sample}.out", sample=config['samplenames'])
+        expand("reads/{sample}.merged.fastq.gz", sample=config['reads'])
 
-rule dosomething:
+rule merge_reads:
     input:
-        lambda wildcards: config['rawdata'][wildcards.sample]
+        fwd=lambda wildcards: config['reads'][wildcards.sample]['fwd'],
+        rev=lambda wildcards: config['reads'][wildcards.sample]['rev']
     output:
-        "{sample}.out"
-    # conda: "example.yml"
-    threads: 1
+        merged="reads/{sample}.merged.fastq.gz",
+        unmerged="reads/{sample}.unmerged.fastq.gz",
+        ihist="reads/{sample}.ihist.txt"
+    log: "merge_reads.{sample}.log"
+    conda: "envs/mappers.yml"
+    threads: 16
     shell:
-        "cat {input} > {output}"
+        "bbmerge.sh threads={threads} in={input.fwd} in2={input.rev} out={output.merged} outu={output.unmerged} ihist={output.ihist} &> {log}"
