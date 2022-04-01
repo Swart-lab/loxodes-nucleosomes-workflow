@@ -12,3 +12,4 @@ reads:
     fwd: /ebio/abt2_projects/ag-swart-loxodes-raw/data/dnase-seq/505_2U_S3_R1_001.fastq.gz
     rev: /ebio/abt2_projects/ag-swart-loxodes-raw/data/dnase-seq/505_2U_S3_R2_001.fastq.gz
 
+ref_asm_mac: /ebio/abt2_projects/ag-swart-loxodes/assembly/falcon-comb_LmagMAC/scaffolds.fasta

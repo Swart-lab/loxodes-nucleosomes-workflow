@@ -4,7 +4,22 @@
 
 rule all:
     input:
-        expand("reads/{sample}.merged.fastq.gz", sample=config['reads'])
+        expand("mapping/map.{sample}.ref_asm_mac.bam", sample=config['reads'])
+
+rule map_pe:
+    input:
+        fwd=lambda wildcards: config['reads'][wildcards.sample]['fwd'],
+        rev=lambda wildcards: config['reads'][wildcards.sample]['rev'],
+        ref=config['ref_asm_mac']
+    output:
+        outm="mapping/map.{sample}.ref_asm_mac.bam",
+        ihist="mapping/map.{sample}.ref_asm_mac.ihist"
+    log: "map_pe.{sample}.log"
+    conda: "envs/mappers.yml"
+    threads: 16
+    shell:
+        "bbmap.sh in={input.fwd} in2={input.rev} threads={threads} ref={input.ref} nodisk semiperfectmode pairlen=1000 pairedonly ihist={output.ihist} outm={output.outm}"
+
 
 rule merge_reads:
     input:
