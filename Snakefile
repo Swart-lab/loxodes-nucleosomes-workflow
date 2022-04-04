@@ -12,13 +12,16 @@ rule map_pe:
         rev=lambda wildcards: config['reads'][wildcards.sample]['rev'],
         ref=config['ref_asm_mac']
     output:
-        outm="mapping/map.{sample}.ref_asm_mac.bam",
-        ihist="mapping/map.{sample}.ref_asm_mac.ihist"
-    log: "map_pe.{sample}.log"
+        outm="mapping/map.{sample}.ref_asm_mac.bam"
+        # ihist="mapping/map.{sample}.ref_asm_mac.ihist"
+    log: "logs/map_pe.{sample}.log"
     conda: "envs/mappers.yml"
     threads: 16
     shell:
-        "bbmap.sh in={input.fwd} in2={input.rev} threads={threads} ref={input.ref} nodisk semiperfectmode pairlen=1000 pairedonly ihist={output.ihist} outm={output.outm}"
+        r"""
+        minimap2 -ax sr -t {threads} -N 2 {input.ref} {input.fwd} {input.rev} 2> {log} | samtools view -b > {output}
+        """
+        # "bbmap.sh in={input.fwd} in2={input.rev} threads={threads} ref={input.ref} nodisk semiperfectmode pairlen=1000 pairedonly ihist={output.ihist} outm={output.outm}"
 
 
 rule merge_reads:
