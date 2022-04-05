@@ -4,7 +4,23 @@
 
 rule all:
     input:
-        expand("mapping/map.{sample}.ref_asm_mac.bam", sample=config['reads'])
+        expand("mapping/map.{sample}.ref_asm_mac.sort.bam", sample=config['reads'])
+
+rule sort_mapping:
+    input:
+        bam="mapping/map.{sample}.ref_asm_mac.bam",
+        ref=config['ref_asm_mac']
+    output:
+        bam=protected("mapping/map.{sample}.ref_asm_mac.sort.bam"),
+        idx="mapping/map.{sample}.ref_asm_mac.sort.bam.bai"
+    log: "logs/sort_mapping.{sample}.log"
+    threads: 8
+    conda: "envs/mappers.yml"
+    shell:
+        r"""
+        samtools sort --threads {threads} --reference {input.ref} -T /tmp/map.{wildcards.sample}.ref_asm_mac.sort -o {output.bam} {input.bam} 2> {log};
+        samtools index -@ {threads} {output.bam} 2>> {log};
+        """
 
 rule map_pe:
     input:
@@ -12,7 +28,7 @@ rule map_pe:
         rev=lambda wildcards: config['reads'][wildcards.sample]['rev'],
         ref=config['ref_asm_mac']
     output:
-        outm="mapping/map.{sample}.ref_asm_mac.bam"
+        outm=temp("mapping/map.{sample}.ref_asm_mac.bam")
         # ihist="mapping/map.{sample}.ref_asm_mac.ihist"
     log: "logs/map_pe.{sample}.log"
     conda: "envs/mappers.yml"
