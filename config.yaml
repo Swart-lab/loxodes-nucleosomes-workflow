@@ -13,3 +13,5 @@ reads:
     rev: /ebio/abt2_projects/ag-swart-loxodes-raw/data/dnase-seq/505_2U_S3_R2_001.fastq.gz
 
 ref_asm_mac: /ebio/abt2_projects/ag-swart-loxodes/assembly/falcon-comb_LmagMAC/scaffolds.fasta
+ref_asm_mac_annot: /ebio/abt2_projects/ag-swart-loxodes/annotation/falcon-comb_LmagMAC/pogigwasc_intronless/falcon-comb_LmagMAC.pogigwasc_realtrons.no_rep.gff3
+ref_asm_mac_repbed: /ebio/abt2_projects/ag-swart-loxodes/annotation/falcon-comb_LmagMAC/trf/falcon-comb_LmagMAC.trf.no_overlap.min1000.merge.bed

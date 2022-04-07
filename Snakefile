@@ -1,10 +1,76 @@
 # If rules are split across multiple snakefiles, list them here
 # include: "rules-A"
 # include: "rules-B"
+from collections import defaultdict
 
 rule all:
     input:
-        expand("mapping/map.{sample}.ref_asm_mac.sort.bam", sample=config['reads'])
+        expand("plots/all.{ranges}.{sample}.phaseogram.gene.png", sample=config['reads'], ranges=['126_166', '96_136']),
+        expand('mapping/map.{sample}.ref_asm_mac.sort.nonrep.bam', sample=config['reads']),
+        # expand("mapping/map.{sample}.ref_asm_mac.sort.bam", sample=config['reads'])
+
+rule filter_nonrepetitive:
+    input:
+        bed='mapping/notrep.bed',
+        bam="mapping/map.{sample}.ref_asm_mac.sort.bam"
+    output:
+        'mapping/map.{sample}.ref_asm_mac.sort.nonrep.bam'
+    conda: 'envs/mappers.yml'
+    log: 'logs/filter_nonrepetitive.{sample}.log'
+    threads: 8
+    shell:
+        r"""
+        samtools view -bh -o {output} -L {input.bed} --threads {threads} {input.bam};
+        samtools index {output}
+        """
+
+rule nonrepetitive:
+    # Get regions that are not annotated as low-complexity repeats
+    input:
+        bed=config['ref_asm_mac_repbed'],
+        g='mapping/ref.ctgsizes'
+    output:
+        'mapping/notrep.bed'
+    conda: 'envs/mappers.yml'
+    shell:
+        r"""
+        bedtools complement -i {input.bed} -g {input.g} > {output}
+        """
+
+rule chromsize:
+    # contig lengths in genome assembly required for bedtools complement
+    input:
+        config['ref_asm_mac']
+    output:
+        'mapping/ref.ctgsizes'
+    run:
+        ctglens = defaultdict(int)
+        with open(input[0], 'r') as fh:
+            for line in fh:
+                if line.startswith('>'):
+                    curr_ctg = line.rstrip()[1:].split()[0] # Split on whitespace
+                else:
+                    ctglens[curr_ctg] += len(line.rstrip())
+        with open(output[0], 'w') as fo:
+            for ctg in ctglens:
+                fo.write(ctg + '\t' + str(ctglens[ctg]) + '\n')
+
+
+rule phaseogram:
+    input:
+        bam="mapping/map.{sample}.ref_asm_mac.sort.bam",
+        gff=config['ref_asm_mac_annot']
+    output:
+        'plots/all.{fragmin}_{fragmax}.{sample}.phaseogram.gene.png'
+    log: 'logs/phaseogram.{fragmin}_{fragmax}.{sample}.log'
+    conda: 'envs/mnutils.yml'
+    params:
+        mnutils='/ebio/abt2_projects/ag-swart-loxodes/analysis/nucleosomes/opt/mnutils/mnutils.py',
+        prefix='plots/all.{fragmin}_{fragmax}.{sample}'
+    shell:
+        r"""
+        python {params.mnutils} -i {input.bam} -o {params.prefix} --min_tlen {wildcards.fragmin} --max_tlen {wildcards.fragmax} --gff {input.gff} --feature gene --phaseogram --dump &> {log}
+        """
 
 rule sort_mapping:
     input:
@@ -38,7 +104,6 @@ rule map_pe:
         minimap2 -ax sr -t {threads} -N 2 {input.ref} {input.fwd} {input.rev} 2> {log} | samtools view -b > {output}
         """
         # "bbmap.sh in={input.fwd} in2={input.rev} threads={threads} ref={input.ref} nodisk semiperfectmode pairlen=1000 pairedonly ihist={output.ihist} outm={output.outm}"
-
 
 rule merge_reads:
     input:

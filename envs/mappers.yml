@@ -6,3 +6,4 @@ dependencies:
   - bbmap>=38.18
   - minimap2=2.24
   - samtools
+  - bedtools=2.30.0
