@@ -18,7 +18,7 @@ WD=/ebio/abt2_projects/ag-swart-loxodes/analysis/nucleosomes
 source activate $SNAKEMAKE_ENV
 
 snakemake \
---cores 36 \
+--cores 48 \
 --configfile $WD/workflow/config.yaml \
 --use-conda \
 --conda-frontend mamba \

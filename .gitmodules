@@ -1,0 +1,3 @@
+[submodule "mnutils"]
+	path = mnutils
+	url = git@github.com:Swart-lab/mnutils.git
