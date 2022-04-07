@@ -63,9 +63,9 @@ rule phaseogram:
     output:
         'plots/{which}.{fragmin}_{fragmax}.{sample}.phaseogram.gene.png'
     log: 'logs/phaseogram.{fragmin}_{fragmax}.{sample}.{which}.log'
-    conda: 'envs/mnutils.yml'
+    conda: 'mnutils/env.yml'
     params:
-        mnutils='/ebio/abt2_projects/ag-swart-loxodes/analysis/nucleosomes/opt/mnutils/mnutils.py',
+        mnutils='workflow/mnutils/mnutils.py',
         prefix='plots/{which}.{fragmin}_{fragmax}.{sample}'
     shell:
         r"""
