@@ -5,8 +5,8 @@ from collections import defaultdict
 
 rule all:
     input:
-        expand("plots/all.{ranges}.{sample}.phaseogram.gene.png", sample=config['reads'], ranges=['126_166', '96_136']),
-        expand('mapping/map.{sample}.ref_asm_mac.sort.nonrep.bam', sample=config['reads']),
+        expand("plots/{which}.{ranges}.{sample}.phaseogram.gene.png", sample=config['reads'], ranges=['126_166', '96_136'], which=['sort','nonrep']),
+        expand('mapping/map.{sample}.ref_asm_mac.nonrep.bam', sample=config['reads']),
         # expand("mapping/map.{sample}.ref_asm_mac.sort.bam", sample=config['reads'])
 
 rule filter_nonrepetitive:
@@ -14,7 +14,7 @@ rule filter_nonrepetitive:
         bed='mapping/notrep.bed',
         bam="mapping/map.{sample}.ref_asm_mac.sort.bam"
     output:
-        'mapping/map.{sample}.ref_asm_mac.sort.nonrep.bam'
+        'mapping/map.{sample}.ref_asm_mac.nonrep.bam'
     conda: 'envs/mappers.yml'
     log: 'logs/filter_nonrepetitive.{sample}.log'
     threads: 8
@@ -58,15 +58,15 @@ rule chromsize:
 
 rule phaseogram:
     input:
-        bam="mapping/map.{sample}.ref_asm_mac.sort.bam",
+        bam="mapping/map.{sample}.ref_asm_mac.{which}.bam",
         gff=config['ref_asm_mac_annot']
     output:
-        'plots/all.{fragmin}_{fragmax}.{sample}.phaseogram.gene.png'
-    log: 'logs/phaseogram.{fragmin}_{fragmax}.{sample}.log'
+        'plots/{which}.{fragmin}_{fragmax}.{sample}.phaseogram.gene.png'
+    log: 'logs/phaseogram.{fragmin}_{fragmax}.{sample}.{which}.log'
     conda: 'envs/mnutils.yml'
     params:
         mnutils='/ebio/abt2_projects/ag-swart-loxodes/analysis/nucleosomes/opt/mnutils/mnutils.py',
-        prefix='plots/all.{fragmin}_{fragmax}.{sample}'
+        prefix='plots/{which}.{fragmin}_{fragmax}.{sample}'
     shell:
         r"""
         python {params.mnutils} -i {input.bam} -o {params.prefix} --min_tlen {wildcards.fragmin} --max_tlen {wildcards.fragmax} --gff {input.gff} --feature gene --phaseogram --dump &> {log}
