@@ -5,9 +5,24 @@ from collections import defaultdict
 
 rule all:
     input:
-        expand("plots/{which}.{ranges}.{sample}.phaseogram.gene.png", sample=config['reads'], ranges=['126_166', '96_136'], which=['sort','nonrep']),
-        expand('mapping/map.{sample}.ref_asm_mac.nonrep.bam', sample=config['reads']),
+        expand("plots/{which}.{ranges}.{sample}.phaseogram.gene.png", sample=config['reads'], ranges=['126_166', '96_136'], which=['sort','nonrep','rep']),
+        # expand('mapping/map.{sample}.ref_asm_mac.nonrep.bam', sample=config['reads']),
         # expand("mapping/map.{sample}.ref_asm_mac.sort.bam", sample=config['reads'])
+
+rule filter_repetitive:
+    input:
+        bed=config['ref_asm_mac_repbed'],
+        bam="mapping/map.{sample}.ref_asm_mac.sort.bam"
+    output:
+        'mapping/map.{sample}.ref_asm_mac.rep.bam'
+    conda: 'envs/mappers.yml'
+    log: 'logs/filter_repetitive.{sample}.log'
+    threads: 8
+    shell:
+        r"""
+        samtools view -bh -o {output} -L {input.bed} --threads {threads} {input.bam};
+        samtools index {output}
+        """
 
 rule filter_nonrepetitive:
     input:
