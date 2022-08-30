@@ -125,11 +125,12 @@ rule merge_reads:
         fwd=lambda wildcards: config['reads'][wildcards.sample]['fwd'],
         rev=lambda wildcards: config['reads'][wildcards.sample]['rev']
     output:
-        merged="reads/{sample}.merged.fastq.gz",
-        unmerged="reads/{sample}.unmerged.fastq.gz",
+        # merged="reads/{sample}.merged.fastq.gz",
+        # unmerged="reads/{sample}.unmerged.fastq.gz",
         ihist="reads/{sample}.ihist.txt"
     log: "merge_reads.{sample}.log"
     conda: "envs/mappers.yml"
     threads: 16
     shell:
-        "bbmerge.sh threads={threads} in={input.fwd} in2={input.rev} out={output.merged} outu={output.unmerged} ihist={output.ihist} &> {log}"
+        # "bbmerge.sh threads={threads} in={input.fwd} in2={input.rev} out={output.merged} outu={output.unmerged} ihist={output.ihist} &> {log}"
+        "bbmerge.sh threads={threads} in={input.fwd} in2={input.rev} ihist={output.ihist} &> {log}"
