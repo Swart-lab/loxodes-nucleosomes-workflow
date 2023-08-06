@@ -1,0 +1,6 @@
+/envs
+/logs
+/mapping
+/reads
+/test
+/.snakemake
