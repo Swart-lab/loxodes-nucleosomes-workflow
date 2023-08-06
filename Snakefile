@@ -122,15 +122,25 @@ rule map_pe:
 
 rule merge_reads:
     input:
-        fwd=lambda wildcards: config['reads'][wildcards.sample]['fwd'],
-        rev=lambda wildcards: config['reads'][wildcards.sample]['rev']
+        fwd='reads/{sample}.trim.fwd.fastq.gz',
+        rev='reads/{sample}.trim.rev.fastq.gz'
     output:
-        # merged="reads/{sample}.merged.fastq.gz",
-        # unmerged="reads/{sample}.unmerged.fastq.gz",
         ihist="reads/{sample}.ihist.txt"
-    log: "merge_reads.{sample}.log"
+    log: "logs/merge_reads.{sample}.log"
     conda: "envs/mappers.yml"
     threads: 16
     shell:
-        # "bbmerge.sh threads={threads} in={input.fwd} in2={input.rev} out={output.merged} outu={output.unmerged} ihist={output.ihist} &> {log}"
         "bbmerge.sh threads={threads} in={input.fwd} in2={input.rev} ihist={output.ihist} &> {log}"
+
+rule trim_reads:
+    input:
+        fwd=lambda wildcards: config['reads'][wildcards.sample]['fwd'],
+        rev=lambda wildcards: config['reads'][wildcards.sample]['rev']
+    output:
+        fwd='reads/{sample}.trim.fwd.fastq.gz',
+        rev='reads/{sample}.trim.rev.fastq.gz'
+    log: "logs/trim_reads.{sample}.log"
+    conda: "envs/mappers.yml"
+    threads: 16
+    shell:
+        "bbduk.sh threads={threads} in={input.fwd} in2={input.rev} ktrim=r out={output.fwd} out2={output.rev} ref=adapters,workflow/adapters.fasta &> {log}"
